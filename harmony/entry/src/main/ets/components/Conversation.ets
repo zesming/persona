@@ -251,11 +251,13 @@ export struct Conversation {
   @Local attachmentInset: number = 0;
   private attachmentNodeId: string = 'chat.attachment.' + util.generateRandomUUID();
   private attachmentLayoutReady: boolean = false;
-  private expandedComposer(): boolean { return this.fieldFocused || !!this.model.draft || this.attachments.attachments.length > 0 || this.environment.fontScale >= 1.5 || this.composerWidth < Tokens.compactPane || (this.composerColumns() - this.leftColumns() - this.sendColumns()) * this.composerWidth / this.composerColumns() < Tokens.minimumInput; }
+  private leftActionWidth(): number { const count = (this.model.demo ? 0 : 1) + (this.showContextMenu ? 1 : 0); return count * Tokens.touch + Math.max(0, count - 1) * Tokens.gap; }
+  private expandedComposer(): boolean { return this.fieldFocused || !!this.model.draft || this.attachments.attachments.length > 0 || this.environment.fontScale >= 1.5 || this.composerWidth < Tokens.compactPane || this.composerWidth - this.leftActionWidth() - Tokens.touch - (this.leftActionWidth() ? 2 : 1) * Tokens.gap < Tokens.minimumInput; }
   private verticalActions(): boolean { return this.environment.fontScale >= 1.5 || this.composerWidth < Tokens.composerNarrowActions; }
-  private composerColumns(): number { return 12; }
-  private sendColumns(): number { return Math.ceil(Tokens.touch * this.composerColumns() / this.composerWidth); }
-  private leftColumns(): number { const count = (this.model.demo ? 0 : 1) + (this.showContextMenu ? 1 : 0); return Math.ceil((count * Tokens.touch + (count > 1 ? Tokens.gap : 0)) * this.composerColumns() / this.composerWidth); }
+  // Native ordering keeps the same editor mounted. Compact slots use pixel precision, not twelfths of the row.
+  private composerColumns(): number { return this.expandedComposer() ? 12 : Math.max(1, Math.round(this.getUIContext().vp2px(this.composerWidth))); }
+  private sendColumns(): number { const width = Tokens.touch + (this.expandedComposer() ? 0 : Tokens.gap); return Math.ceil(width * this.composerColumns() / this.composerWidth); }
+  private leftColumns(): number { const width = this.leftActionWidth(); return Math.ceil((width + (width && !this.expandedComposer() ? Tokens.gap : 0)) * this.composerColumns() / this.composerWidth); }
   private primaryStop(): boolean { return !this.model.decision && this.model.canCompose() && this.model.canStop() && !this.model.draft.trim() && !this.attachments.attachments.length; }
   @Monitor('active', 'model.selected', 'model.sessions', 'model.connected', 'model.draft', 'model.decision', 'attachments.attachments', 'model.interruptPendingKey')
   primaryStopChanged(): void { this.onPrimaryStop(this.active && this.primaryStop()); }
@@ -810,7 +812,7 @@ export struct Conversation {
               (this.model.draft.trim().length > 0 || this.attachments.attachments.length > 0) && this.model.operationState !== 'pending' && this.model.operationState !== 'unknown')
             .onClick(() => { if (this.primaryStop()) this.model.stop(() => this.active); else this.sendDraft(); }).id('chat.send')
         }
-      }.width('100%').onAreaChange((_old: Area, area: Area) => this.composerWidth = Number(area.width))
+      }.width('100%').onAreaChange((_old: Area, area: Area) => { const width = Number(area.width); if (Number.isFinite(width) && width > 0) this.composerWidth = width; })
     }.padding(Tokens.gap).backgroundColor(Colors.subtle).borderRadius(Tokens.capsule).width('100%').id('chat.composer')
   }
 
