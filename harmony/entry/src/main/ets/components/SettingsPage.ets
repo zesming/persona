@@ -1105,8 +1105,8 @@ export struct SettingsPage {
           onRefresh: this.appearanceRefreshAction(revision) })
       }, (revision: number) => String(revision))
       ListItem() {
-        Flex({ wrap: FlexWrap.Wrap, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
-          Text(tr('language')).fontSize(Tokens.body).fontColor(Colors.ink).flexGrow(1).flexShrink(0).constraintSize({ maxWidth: '100%' })
+        Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
+          Text(tr('language')).fontSize(Tokens.body).fontColor(Colors.ink).flexShrink(0).constraintSize({ maxWidth: '100%' })
           Select([{ value: tr('system') }, { value: 'English' }, { value: '简体中文' }, { value: '日本語' }])
             .selected(['default', 'en-US', 'zh-CN', 'ja-JP'].indexOf(this.model.language))
             .value(this.model.language === 'default' ? tr('system') : this.model.language === 'en-US' ? 'English' : this.model.language === 'zh-CN' ? '简体中文' : '日本語')
@@ -1115,8 +1115,8 @@ export struct SettingsPage {
         }.constraintSize({ minHeight: Tokens.touch }).padding({ left: Tokens.page, right: Tokens.page, top: Tokens.inset, bottom: Tokens.inset }).width('100%')
       }
       ListItem() {
-        Flex({ wrap: FlexWrap.Wrap, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
-          Text(tr('color_mode')).fontSize(Tokens.body).fontColor(Colors.ink).flexGrow(1).flexShrink(0).constraintSize({ maxWidth: '100%' })
+        Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
+          Text(tr('color_mode')).fontSize(Tokens.body).fontColor(Colors.ink).flexShrink(0).constraintSize({ maxWidth: '100%' })
           Select([{ value: tr('system') }, { value: tr('light') }, { value: tr('dark') }]).selected(this.model.appearance)
             .value(tr(['system', 'light', 'dark'][this.model.appearance] || 'system'))
             .flexShrink(0).constraintSize({ minHeight: Tokens.touch, maxWidth: '100%' }).enabled(this.appearanceCurrent(this.model, this.appearanceRevision, this.model.scope(), this.model.connectionGeneration()))
@@ -1124,8 +1124,8 @@ export struct SettingsPage {
         }.constraintSize({ minHeight: Tokens.touch }).padding({ left: Tokens.page, right: Tokens.page, top: Tokens.inset, bottom: Tokens.inset }).width('100%')
       }
       ListItem() {
-        Flex({ wrap: FlexWrap.Wrap, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
-          Text(tr('style')).fontSize(Tokens.body).fontColor(Colors.ink).flexGrow(1).flexShrink(0).constraintSize({ maxWidth: '100%' })
+        Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
+          Text(tr('style')).fontSize(Tokens.body).fontColor(Colors.ink).flexShrink(0).constraintSize({ maxWidth: '100%' })
           Select([{ value: tr('app_style_system') }, { value: tr('app_style_glass') }, { value: tr('app_style_brief') }, { value: tr('app_style_board') }])
             .selected(['system', 'glass', 'brief', 'board'].indexOf(this.model.style) < 0 ? 0 : ['system', 'glass', 'brief', 'board'].indexOf(this.model.style))
             .value(tr(['system', 'glass', 'brief', 'board'].includes(this.model.style) ? 'app_style_' + this.model.style : 'app_style_system'))
@@ -1134,8 +1134,8 @@ export struct SettingsPage {
         }.constraintSize({ minHeight: Tokens.touch }).padding({ left: Tokens.page, right: Tokens.page, top: Tokens.inset, bottom: Tokens.inset }).width('100%')
       }
       ListItem() {
-        Flex({ wrap: FlexWrap.Wrap, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
-          Text(tr('agent_density')).fontSize(Tokens.body).fontColor(Colors.ink).flexGrow(1).flexShrink(0).constraintSize({ maxWidth: '100%' })
+        Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
+          Text(tr('agent_density')).fontSize(Tokens.body).fontColor(Colors.ink).flexShrink(0).constraintSize({ maxWidth: '100%' })
           Select([{ value: tr('agent_density_standard') }, { value: tr('agent_density_compact') }])
             .selected(this.look.density === 'compact' ? 1 : 0)
             .value(tr(this.look.density === 'compact' ? 'agent_density_compact' : 'agent_density_standard'))
@@ -1144,8 +1144,8 @@ export struct SettingsPage {
         }.constraintSize({ minHeight: Tokens.touch }).padding({ left: Tokens.page, right: Tokens.page, top: Tokens.inset, bottom: Tokens.inset }).width('100%')
       }
     ListItem() {
-      Flex({ wrap: FlexWrap.Wrap, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
-        Text(tr('grouping')).fontSize(Tokens.body).fontColor(Colors.ink).flexGrow(1).flexShrink(0).constraintSize({ maxWidth: '100%' })
+      Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
+        Text(tr('grouping')).fontSize(Tokens.body).fontColor(Colors.ink).flexShrink(0).constraintSize({ maxWidth: '100%' })
         if (this.agentWorkspace.isBoundTo(this.model) && !this.agentWorkspace.loading) {
           Select([{ value: tr('agent_group_flat') }, { value: tr('agent_filter_machine') },
             { value: tr('agent_filter_repository') }, { value: tr('agent_filter_worktree') }])

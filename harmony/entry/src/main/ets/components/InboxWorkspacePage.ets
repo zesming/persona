@@ -442,6 +442,16 @@ export struct InboxWorkspacePage {
       .onClick(() => this.refreshList())
     Button(tr('compose')).attributeModifier(ButtonStyles.quiet).onClick(() => this.openMailCompose())
   }
+  @Builder sourceFilterControl() {
+    Select(this.optionList(this.workspace.sourceOptions.map((value: string) => this.sourceLabel(value))))
+      .selected(this.sourceIndex()).value(this.sourceLabel(this.workspace.sourceFilter)).onSelect((index: number) => this.workspace.sourceFilter = this.workspace.sourceOptions[index])
+      .constraintSize({ minHeight: Tokens.touch }).width('100%')
+  }
+  @Builder accountFilterControl() {
+    Select(this.optionList(this.workspace.accountOptions.map((value: string) => value === 'all' ? tr('all') : this.workspace.accountName(value))))
+      .selected(this.accountIndex()).value(this.workspace.accountFilter === 'all' ? tr('all') : this.workspace.accountName(this.workspace.accountFilter)).onSelect((index: number) => this.workspace.accountFilter = this.workspace.accountOptions[index])
+      .constraintSize({ minHeight: Tokens.touch }).width('100%')
+  }
   @Builder inboxList() {
     Column({ space: Tokens.gap }) {
       if (this.environment.fontScale >= 1.5) Column({ space: Tokens.gap }) {
@@ -452,11 +462,13 @@ export struct InboxWorkspacePage {
         this.inboxSearch(true)
         this.inboxActions()
       }.padding({ left: Tokens.page, right: Tokens.page, top: Tokens.gap }).width('100%')
-      Flex({ wrap: FlexWrap.Wrap, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
-        Select(this.optionList(this.workspace.sourceOptions.map((value: string) => this.sourceLabel(value))))
-          .selected(this.sourceIndex()).value(this.sourceLabel(this.workspace.sourceFilter)).onSelect((index: number) => this.workspace.sourceFilter = this.workspace.sourceOptions[index]).flexGrow(1).flexShrink(0).constraintSize({ maxWidth: '100%' })
-        Select(this.optionList(this.workspace.accountOptions.map((value: string) => value === 'all' ? tr('all') : this.workspace.accountName(value))))
-          .selected(this.accountIndex()).value(this.workspace.accountFilter === 'all' ? tr('all') : this.workspace.accountName(this.workspace.accountFilter)).onSelect((index: number) => this.workspace.accountFilter = this.workspace.accountOptions[index]).flexGrow(1).flexShrink(0).constraintSize({ maxWidth: '100%' })
+      if (this.environment.fontScale >= 1.5) Column({ space: Tokens.gap }) {
+        this.sourceFilterControl()
+        this.accountFilterControl()
+      }.width('100%').padding({ left: Tokens.page, right: Tokens.page })
+      else Row({ space: Tokens.gap }) {
+        Column() { this.sourceFilterControl() }.layoutWeight(1)
+        Column() { this.accountFilterControl() }.layoutWeight(1)
       }.width('100%').padding({ left: Tokens.page, right: Tokens.page })
       if (this.environment.fontScale >= 1.5) Row() {
         Select([{ value: tr('inbox_open') }, { value: tr('done') }, { value: tr('all') }])

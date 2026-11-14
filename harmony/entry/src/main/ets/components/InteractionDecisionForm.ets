@@ -492,14 +492,14 @@ export struct InteractionDecisionForm {
       if (this.deferred && !this.readOnly) Button(tr('interaction_question_reopen')).attributeModifier(ButtonStyles.secondary).width('100%')
         .onClick(() => this.deferred = false).id('interaction.reopen')
       else if (!this.readOnly && this.request.kind === 'question') {
-        if (this.pinFooter || this.fillAvailable) Flex({ wrap: FlexWrap.Wrap, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
-          if (this.pinFooter || this.canDefer()) Button(tr('interaction_question_later')).attributeModifier(ButtonStyles.quiet).flexGrow(1).flexShrink(0).enabled(this.canDefer())
+        if (this.pinFooter || this.fillAvailable) Flex({ wrap: FlexWrap.Wrap, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(0), cross: LengthMetrics.vp(Tokens.gap) } }) {
+          if (this.pinFooter || this.canDefer()) Button(tr('interaction_question_later')).attributeModifier(ButtonStyles.quiet).flexGrow(1).flexShrink(0).margin({ end: LengthMetrics.vp(Tokens.gap) }).enabled(this.canDefer())
             .onClick(() => { this.deferred = true; this.onLater(); }).id('interaction.later')
-          if (interactionScreenCanCancel(this.request) && !this.pinFooter) Button(tr('cancel')).attributeModifier(ButtonStyles.secondary).flexGrow(1).flexShrink(0)
+          if (interactionScreenCanCancel(this.request) && !this.pinFooter) Button(tr('cancel')).attributeModifier(ButtonStyles.secondary).flexGrow(1).flexShrink(0).margin({ end: LengthMetrics.vp(Tokens.gap) })
             .enabled(this.canRespond()).onClick(() => this.submit('cancel')).id('interaction.cancel')
           if (interactionScreenCanCancel(this.request) && this.pinFooter) Button({ type: ButtonType.Circle }) { Image(Symbols.more).width(Tokens.symbol).height(Tokens.symbol).fillColor(Colors.ink) }
             .attributeModifier(ButtonStyles.chrome).enabled(this.canRespond()).accessibilityText(tr('more'))
-            .bindMenu([{ value: tr('interaction_question_cancel'), action: () => this.submit('cancel') }]).flexShrink(0).id('interaction.more')
+            .margin({ end: LengthMetrics.vp(Tokens.gap) }).bindMenu([{ value: tr('interaction_question_cancel'), action: () => this.submit('cancel') }]).flexShrink(0).id('interaction.more')
           Button(tr('confirm')).attributeModifier(ButtonStyles.primary).flexGrow(1).flexShrink(0).enabled(this.canSubmit())
             .onClick(() => this.submit('answer')).id('interaction.submit')
         }.width('100%')
@@ -544,7 +544,7 @@ export struct InteractionDecisionForm {
   build() {
     if (this.fillAvailable && !this.pinFooter && this.request.kind !== 'question') Scroll() {
       Column({ space: Tokens.gap }) { this.formBody(); this.responseFooter() }
-        .width('100%').padding({ left: Tokens.page, right: Tokens.page, top: Tokens.page }).alignItems(HorizontalAlign.Start)
+        .width('100%').padding({ top: Tokens.page }).alignItems(HorizontalAlign.Start)
     }.width('100%').height('100%').scrollBar(BarState.Auto).align(Alignment.TopStart).id('interaction.body')
     else Column({ space: Tokens.gap }) {
       if (this.pinFooter || this.fillAvailable) Scroll() {
@@ -553,6 +553,6 @@ export struct InteractionDecisionForm {
       else this.formBody()
       this.responseFooter()
     }.width('100%').height(this.pinFooter || this.fillAvailable ? '100%' : undefined)
-      .padding({ left: Tokens.page, right: Tokens.page, top: Tokens.page, bottom: this.pinFooter || this.fillAvailable ? 0 : Tokens.page }).alignItems(HorizontalAlign.Start)
+      .padding({ left: this.fillAvailable ? 0 : Tokens.page, right: this.fillAvailable ? 0 : Tokens.page, top: Tokens.page, bottom: this.pinFooter || this.fillAvailable ? 0 : Tokens.page }).alignItems(HorizontalAlign.Start)
   }
 }
