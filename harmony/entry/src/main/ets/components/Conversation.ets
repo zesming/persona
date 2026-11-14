@@ -405,7 +405,7 @@ export struct Conversation {
     Column() {
       if (this.contextKind) ContextPicker({ model: this.model, kind: this.contextKind, active: this.active && this.attachmentSheet,
         onSelect: (row: ResourceRow) => this.selectContext(row), onRetired: () => this.attachmentSheet = false })
-    }.width('100%').height('100%').padding({ bottom: this.attachmentInset + Tokens.footer }).id(this.attachmentNodeId)
+    }.width('100%').height('100%').padding({ bottom: this.attachmentInset + Tokens.page }).id(this.attachmentNodeId)
       .onAreaChange(() => this.measureAttachment())
   }
 
@@ -762,7 +762,7 @@ export struct Conversation {
         InteractionDecisionForm({ model: this.model, request: sheet.request, pinFooter: true, draft: sheet.draft, draftSession: sheet.id, admission: this.questions.ticket(sheet),
           onLater: () => this.questions.close(sheet), onResolved: () => this.questions.close(sheet), onLink: this.questionLink(sheet) })
       }, (sheet: QuestionSheet) => sheet.id)
-    }.width('100%').height('100%').padding({ bottom: this.questionInset + Tokens.footer }).id(this.questionNodeId)
+    }.width('100%').height('100%').padding({ bottom: this.questionInset + Tokens.page }).id(this.questionNodeId)
       .onAreaChange(() => this.measureQuestion())
   }
 
@@ -774,7 +774,7 @@ export struct Conversation {
         Text(this.model.contextTitle()).fontSize(Tokens.meta).fontColor(Colors.ink).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).layoutWeight(1)
         Button(tr('remove')).attributeModifier(ButtonStyles.quiet).enabled(!this.sending).onClick(() => this.model.removeContext())
       }.width('100%')
-      GridRow({ columns: this.composerColumns(), gutter: 0 }) {
+      GridRow({ columns: this.composerColumns(), gutter: { x: 0, y: Tokens.gap } }) {
         GridCol({ span: this.expandedComposer() ? this.composerColumns() : this.composerColumns() - this.leftColumns() - this.sendColumns(), order: this.expandedComposer() ? 0 : 1 }) {
           TextArea({ text: this.model.draft, placeholder: tr('message') }).maxLength(Tokens.maxMessage).width('100%')
             .fontSize(Tokens.body).placeholderFont({ size: Tokens.body }).fontColor(Colors.ink).placeholderColor(Colors.secondary)
@@ -798,11 +798,11 @@ export struct Conversation {
               .bindMenu(this.nativeChooser('actions'), this.attachmentNativeMenu, this.attachmentMenuOptions()).id('chat.more')
           }.width('100%').constraintSize({ minHeight: Tokens.touch }).alignItems(VerticalAlign.Center)
         }
-        if (this.expandedComposer()) GridCol({ span: this.verticalActions() ? this.composerColumns() : this.composerColumns() - this.leftColumns() - this.sendColumns(), order: 3 }) {
+        if (this.expandedComposer() && !this.verticalActions()) GridCol({ span: this.composerColumns() - this.leftColumns() - this.sendColumns(), order: 3 }) {
           Row() {
             Blank().layoutWeight(1)
 
-          }.width('100%').constraintSize({ minHeight: this.verticalActions() ? 0 : Tokens.touch })
+          }.width('100%').constraintSize({ minHeight: Tokens.touch })
         }
         GridCol({ span: this.verticalActions() ? this.composerColumns() : this.sendColumns(), order: this.expandedComposer() ? this.verticalActions() ? 1 : 4 : 2 }) {
           Button(tr(this.primaryStop() ? 'stop' : this.model.stopPending() || this.sending ? 'pending' : 'send')).attributeModifier(ButtonStyles.primary).padding(0).width(this.expandedComposer() ? '100%' : Tokens.touch).alignSelf(ItemAlign.End)
@@ -815,7 +815,7 @@ export struct Conversation {
   }
 
   @Builder blockingContent() {
-    Column() {
+    Column({ space: Tokens.gap }) {
       Column() {
         ForEach(this.model.decision ? [this.model.decision] : [], (request: Decision) => {
           InteractionDecisionForm({ model: this.model, request: request, fillAvailable: true, onLink: (address: string) => this.onLink(address) })
@@ -824,18 +824,18 @@ export struct Conversation {
       if (this.showContextMenu) Button({ type: ButtonType.Circle }) { Image(Symbols.more).width(Tokens.symbol).height(Tokens.symbol).fillColor(Colors.ink) }
         .attributeModifier(ButtonStyles.quiet).width(Tokens.touch).height(Tokens.touch).padding(0).accessibilityText(tr('more')).onClick(() => this.openFallbackActions())
         .bindMenu(this.actionsVisible, this.actionsMenu, this.actionMenuOptions(this.actionsRequest)).id('chat.more.fallback')
-      if (this.hasNew && !this.atEnd) Button(tr('latest')).onClick(() => { this.scroller.scrollEdge(Edge.Bottom); this.atEnd = true; this.anchor.atEnd = true; this.hasNew = false; })
+      if (this.hasNew && !this.atEnd) Button(tr('latest')).attributeModifier(ButtonStyles.quiet).onClick(() => { this.scroller.scrollEdge(Edge.Bottom); this.atEnd = true; this.anchor.atEnd = true; this.hasNew = false; }).id('chat.latest')
     }.width('100%').constraintSize({ maxWidth: Tokens.readingMax }).height('100%')
       .padding({ left: Tokens.page, right: Tokens.page, bottom: Tokens.footer, top: Tokens.gap })
   }
   @Builder interactionContent() {
     if (this.model.decision) this.blockingContent()
     else Scroll() {
-      Column() {
+      Column({ space: Tokens.gap }) {
       if (this.showContextMenu && (this.model.decision || !this.model.canCompose())) Button({ type: ButtonType.Circle }) { Image(Symbols.more).width(Tokens.symbol).height(Tokens.symbol).fillColor(Colors.ink) }
         .attributeModifier(ButtonStyles.quiet).width(Tokens.touch).height(Tokens.touch).padding(0).accessibilityText(tr('more')).onClick(() => this.openFallbackActions())
         .bindMenu(this.actionsVisible, this.actionsMenu, this.actionMenuOptions(this.actionsRequest)).id('chat.more.fallback')
-      if (this.hasNew && !this.atEnd) Button(tr('latest')).onClick(() => { this.scroller.scrollEdge(Edge.Bottom); this.atEnd = true; this.anchor.atEnd = true; this.hasNew = false; })
+      if (this.hasNew && !this.atEnd) Button(tr('latest')).attributeModifier(ButtonStyles.quiet).onClick(() => { this.scroller.scrollEdge(Edge.Bottom); this.atEnd = true; this.anchor.atEnd = true; this.hasNew = false; }).id('chat.latest')
       if (this.model.canCompose() && !this.model.decision) {
         if (this.attachments.busy && !this.sending && (this.attachments.errorKey === 'chat_attachment_storage_unavailable' || this.model.error === 'cache_unavailable')) Button(tr('retry')).onClick(() => { this.attachmentKey = ''; this.syncAttachments(); })
         this.composer()
@@ -867,7 +867,7 @@ export struct Conversation {
           .height(this.model.decision ? this.maxControlsHeight() : Math.max(1, Math.min(this.controlsHeight, this.maxControlsHeight())))
       }
     }.width('100%').height('100%').backgroundColor(Colors.canvas).expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
-      .bindSheet($$this.attachmentSheet, this.attachmentContent(), { title: { title: tr(this.contextKind === 'knowledge' ? 'knowledge' : this.contextKind === 'todo' ? 'todos' : this.contextKind === 'inbox' ? 'inbox' : 'attach') }, height: SheetSize.LARGE, preferType: this.availableWidth > Tokens.readingMax ? SheetType.CENTER : SheetType.BOTTOM, showClose: true, onAppear: () => { this.attachmentLayoutReady = true; this.measureAttachment(); }, onDisappear: () => this.attachmentLayoutReady = false })
+      .bindSheet($$this.attachmentSheet, this.attachmentContent(), { title: { title: tr(this.contextKind === 'knowledge' ? 'knowledge' : this.contextKind === 'todo' ? 'todos' : this.contextKind === 'inbox' ? 'inbox' : 'attach') }, height: SheetSize.LARGE, showClose: true, onAppear: () => { this.attachmentLayoutReady = true; this.measureAttachment(); }, onDisappear: () => this.attachmentLayoutReady = false })
       .onAreaChange((_before: Area, area: Area): void => {
       const height = Number(area.height);
       const width = Number(area.width);

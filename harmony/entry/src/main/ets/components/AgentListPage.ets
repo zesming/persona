@@ -483,7 +483,7 @@ export struct AgentListPage {
         .divider({ strokeWidth: Tokens.hairline, startMargin: Tokens.page + Tokens.avatar + Tokens.gap,
           endMargin: Tokens.page, color: Colors.divider })
       }.width('100%').layoutWeight(1).onRefreshing(() => { this.workspace.setReadingDetail(false); this.workspace.refresh(this.model).finally(() => { this.workspace.setReadingDetail(this.readingDetail); this.refreshing = false; }); })
-      .bindSheet($$this.filterSheetOpen, this.filterSheet(), { title: { title: tr('agent_filters_title') }, height: SheetSize.LARGE, showClose: true })
+      .bindSheet($$this.filterSheetOpen, this.filterSheet(), { title: { title: tr('agent_filters_title') }, height: SheetSize.FIT_CONTENT, showClose: true })
     }.width('100%').height('100%').backgroundColor(Colors.canvas)
       .bindSheet($$this.editorOpen, this.renameForm(), { title: { title: tr('rename') }, height: SheetSize.MEDIUM, showClose: true })
   }

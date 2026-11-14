@@ -537,7 +537,7 @@ struct Index {
       List() {
         this.spaceRow('persona')
         ForEach(this.conversationRowBindings, (binding: BoundRow<ResourceRow>) => {
-          ListItem() { this.row(binding) }.onClick(() => { this.spacesShown = false; if (this.model.section !== 0) this.changeSection(0); this.openRow(binding.value); })
+          ListItem() { this.conversationRow(binding, true) }.onClick(() => { this.spacesShown = false; if (this.model.section !== 0) this.changeSection(0); this.openRow(binding.value); })
         }, (binding: BoundRow<ResourceRow>) => binding.key)
         this.spaceRow('inbox')
         this.spaceRow('todo')
@@ -549,7 +549,7 @@ struct Index {
         this.spaceRow('hub')
         if (this.wide() && !this.rail()) this.spaceRow('collapse')
       }.width('100%').layoutWeight(1)
-    }.width('100%').height('100%').padding({ bottom: this.spacesInset + Tokens.footer }).id('shell.spaces.content')
+    }.width('100%').height('100%').padding({ bottom: this.spacesInset + Tokens.page }).id('shell.spaces.content')
       .onAreaChange(() => this.measureSpaces())
   }
   private measureSpaces(): void {
@@ -614,9 +614,17 @@ struct Index {
     this.conversationBindingOwner = this.model;
     this.conversationBindingScope = scope;
   }
-  @Builder row(binding: BoundRow<ResourceRow>) {
-    ComposeListItemV2({ contentItemV2: new ContentItemV2({ primaryText: binding.value.title || binding.value.id,
-      secondaryText: binding.value.kind === 'session' ? [this.model.machineName(binding.value.machine), this.model.shortPath(binding.value.path), binding.value.state ? tr(binding.value.state) : ''].filter((value: string) => value.length > 0).join(' · ') : binding.value.detail || undefined }) })
+  private conversationDetail(row: ResourceRow): string {
+    return row.kind === 'session' ? [this.model.machineName(row.machine), this.model.shortPath(row.path), row.state ? tr(row.state) : ''].filter((value: string) => value.length > 0).join(' · ') : row.detail;
+  }
+  @Builder conversationRow(binding: BoundRow<ResourceRow>, showDetail: boolean) {
+    Row({ space: Tokens.inset }) {
+      SymbolGlyph(Symbols.spaces).fontSize(Tokens.symbolFont).fontColor([Colors.secondary]).width(Tokens.symbol)
+      Column({ space: Tokens.fine }) {
+        Text(binding.value.title || binding.value.id).fontSize(Tokens.body).fontColor(Colors.ink).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+        if (showDetail && this.conversationDetail(binding.value)) Text(this.conversationDetail(binding.value)).fontSize(Tokens.meta).fontColor(Colors.secondary).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+      }.layoutWeight(1).alignItems(HorizontalAlign.Start)
+    }.padding({ left: Tokens.page, right: Tokens.page, top: Tokens.inset, bottom: Tokens.inset }).constraintSize({ minHeight: Tokens.touch }).width('100%')
   }
   @Builder state() {
     if (this.model.busy) LoadingProgress().height(Tokens.touch).width(Tokens.touch)
@@ -643,7 +651,7 @@ struct Index {
         .onDisAppear(() => this.mainRowVisible = 0).onClick(() => this.openMain()).id('persona.main')
       ForEach(this.conversationRowBindings, (binding: BoundRow<ResourceRow>) => {
         ListItem() {
-          Row({ space: Tokens.inset }) { SymbolGlyph(Symbols.spaces).fontSize(Tokens.symbolFont).fontColor([Colors.secondary]).width(Tokens.symbol); Text(binding.value.title).fontSize(Tokens.body).fontColor(Colors.ink).layoutWeight(1).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis }) }.padding({ left: Tokens.page, right: Tokens.page, top: Tokens.inset, bottom: Tokens.inset }).constraintSize({ minHeight: Tokens.touch }).width('100%')
+          this.conversationRow(binding, false)
         }.selectable(true).selected(this.chatSelectionShown('conversation') && this.detailModel === this.model && this.model.target() === this.model.target(binding.value))
           .onVisibleAreaChange([0, 1], (visible: boolean, ratio: number) => { this.rowVisibility.set(this.model.scope() + this.model.target(binding.value), visible ? ratio : 0); if (this.model.target() === this.model.target(binding.value)) this.visibilityEpoch++; })
           .onDisAppear(() => { this.rowVisibility.delete(this.model.scope() + this.model.target(binding.value)); this.visibilityEpoch++; }).onClick(() => this.openRow(binding.value))
@@ -822,6 +830,11 @@ struct Index {
   @Builder destinationTitle(name: string, param: Object) {
     if (this.mainDestination(name, param) && !this.wide()) this.peerTitle(true)
     else Text(this.destinationTitleText(name, param)).height(this.headerHeight()).fontSize(Tokens.title).fontWeight(FontWeight.Medium).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+      .padding({ left: this.destinationBackHidden(name, param) ? Tokens.page : 0 })
+  }
+  private destinationBackHidden(name: string, param: Object): boolean {
+    if (this.mainDestination(name, param) || name === 'session' && Wire.bool(this.routeRow(param).data(), 'navigation_root') && this.wide() && this.model.section === 1) return true;
+    return this.wide() && this.stack.size() === 1 && this.stack.getAllPathName()[0] === name && this.stack.getParamByIndex(0) === param;
   }
   private destinationTitleText(name: string, param: Object): string {
     if (name === 'settings_root') return tr('settings');
@@ -896,7 +909,7 @@ struct Index {
         else this.targetLoading(name, param)
       }
     }.title({ builder: () => this.destinationTitle(name, param), height: this.headerHeight() }, { systemMaterial: this.titleMaterial })
-      .hideTitleBar(this.hideChatTitle(name, param)).hideBackButton(this.mainDestination(name, param) || name === 'session' && Wire.bool(this.routeRow(param).data(), 'navigation_root') && this.wide() && this.model.section === 1)
+      .hideTitleBar(this.hideChatTitle(name, param)).hideBackButton(this.destinationBackHidden(name, param))
       .backgroundColor(name === 'resources' && param === 'inbox' ? Colors.grouped : Colors.canvas)
       .menus(this.destinationMenus(name, param))
       .bindMenu(this.chatTitleMenuVisible && this.activeChild === this.childKey(name, param), this.chatActionsMenu, this.chatMenuOptions(this.chatMenuRevision))
@@ -921,6 +934,7 @@ struct Index {
       } else {
         Navigation(this.stack) { this.primaryContent() }.title({ builder: this.peerTitle, height: this.headerHeight() }, { systemMaterial: this.titleMaterial }).titleMode(NavigationTitleMode.Mini)
           .hideBackButton(true).hideTitleBar(this.rail()).menus([])
+          .backgroundColor(this.peer() === 0 ? Colors.grouped : Colors.canvas)
           .toolbarConfiguration(this.rail() ? [{ value: tr('expand'), icon: $r('sys.media.ohos_ic_public_arrow_right'), action: () => this.collapsed = false }] : [])
           .mode(this.wide() ? NavigationMode.Split : NavigationMode.Stack)
           .navBarWidth(this.rail() ? Tokens.collapsed : Tokens.master).navBarWidthRange(this.rail() ? [Tokens.collapsed, Tokens.collapsed] : [Tokens.masterMin, Tokens.masterMax])

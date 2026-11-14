@@ -154,7 +154,7 @@ export struct AssistantCards {
       } else Text(tr('assistant_feed_plan_unavailable')).fontSize(Tokens.meta).fontColor(Colors.secondary).width('100%')
       Button(tr('assistant_detail_view_plan')).attributeModifier(ButtonStyles.secondary).width('100%').enabled(this.active)
         .onClick(() => this.openDetail(item)).id('assistant.detail.plan.' + Wire.text(item, 'id'))
-    }.width('100%').padding(Tokens.inset).alignItems(HorizontalAlign.Start).backgroundColor(Colors.grouped)
+    }.width('100%').padding(Tokens.page).alignItems(HorizontalAlign.Start).backgroundColor(Colors.grouped)
   }
 
   @Builder planCard(item: Record<string, Object>) {
@@ -204,7 +204,7 @@ export struct AssistantCards {
             .onClick(() => this.feed.refreshPlan(this.planId(item))).accessibilityText(tr('refresh'))
         }.width('100%')
       }
-    }.width('100%').padding(this.detailOnly ? Tokens.page : Tokens.inset).alignItems(HorizontalAlign.Start)
+    }.width('100%').padding(Tokens.page).alignItems(HorizontalAlign.Start)
       .backgroundColor(Colors.grouped)
   }
 
@@ -308,7 +308,7 @@ export struct AssistantCards {
       if (projection.summary) Text(projection.summary).fontSize(Tokens.body).width('100%').maxLines(3)
       Button(tr('assistant_detail_view_receipt')).attributeModifier(ButtonStyles.secondary).width('100%').enabled(this.active)
         .onClick(() => this.openDetail(item)).id('assistant.detail.receipt.' + Wire.text(item, 'id'))
-    }.width('100%').padding(Tokens.inset).alignItems(HorizontalAlign.Start).backgroundColor(Colors.grouped)
+    }.width('100%').padding(Tokens.page).alignItems(HorizontalAlign.Start).backgroundColor(Colors.grouped)
   }
 
   @Builder receiptCriteriaRow(criterion: AssistantReceiptCriterion) {
@@ -370,7 +370,7 @@ export struct AssistantCards {
         ForEach(this.todoAgents(todoId), (agent: Record<string, Object>) => this.agentRow(todoId, agent),
           (agent: Record<string, Object>) => Wire.text(agent, 'machine_id') + '/' + Wire.text(agent, 'session_id'))
       }
-    }.width('100%').alignItems(HorizontalAlign.Start).padding(this.detailOnly ? Tokens.page : Tokens.inset)
+    }.width('100%').alignItems(HorizontalAlign.Start).padding(Tokens.page)
       .backgroundColor(Colors.grouped)
   }
 
@@ -388,7 +388,7 @@ export struct AssistantCards {
           if (Wire.text(entry, 'answer')) Text(Wire.text(entry, 'answer')).fontSize(Tokens.body)
         }.width('100%').alignItems(HorizontalAlign.Start)
       }, (_entry: Record<string, Object>, index: number) => String(index))
-    }.width('100%').alignItems(HorizontalAlign.Start).padding(Tokens.inset)
+    }.width('100%').alignItems(HorizontalAlign.Start).padding(Tokens.page)
       .backgroundColor($r('sys.color.comp_background_tertiary'))
   }
 
@@ -404,7 +404,7 @@ export struct AssistantCards {
           Text(tr('assistant_feed_check_' + (Wire.bool(check, 'met') ? 'met' : 'not_met'))).fontColor($r('sys.color.font_secondary'))
         }.width('100%')
       }, (_check: Record<string, Object>, index: number) => String(index))
-    }.width('100%').alignItems(HorizontalAlign.Start).padding(Tokens.inset)
+    }.width('100%').alignItems(HorizontalAlign.Start).padding(Tokens.page)
       .backgroundColor($r('sys.color.comp_background_tertiary'))
   }
 
@@ -414,7 +414,7 @@ export struct AssistantCards {
         .fontSize(Tokens.meta).fontColor($r('sys.color.font_secondary'))
       if (Wire.text(this.itemBody(item), 'text')) MarkdownText({ text: Wire.text(this.itemBody(item), 'text'), onLink: (address: string) => this.onLink(address) })
       if (Wire.bool(this.itemBody(item), 'interrupted')) Text(tr('assistant_feed_interrupted')).fontSize(Tokens.meta).fontColor($r('sys.color.font_secondary'))
-    }.width('100%').alignItems(HorizontalAlign.Start).padding(Tokens.inset)
+    }.width('100%').alignItems(HorizontalAlign.Start).padding(Tokens.page)
       .backgroundColor($r('sys.color.comp_background_tertiary'))
   }
 
@@ -423,7 +423,7 @@ export struct AssistantCards {
       Text(tr('assistant_feed_report')).fontSize(Tokens.body).fontWeight(FontWeight.Medium)
       if (this.reportText(item)) MarkdownText({ text: this.reportText(item), onLink: (address: string) => this.onLink(address) })
       else Text(tr('assistant_feed_report_unavailable')).fontSize(Tokens.meta).fontColor($r('sys.color.font_secondary'))
-    }.width('100%').alignItems(HorizontalAlign.Start).padding(Tokens.inset)
+    }.width('100%').alignItems(HorizontalAlign.Start).padding(Tokens.page)
       .backgroundColor($r('sys.color.comp_background_tertiary'))
   }
 
@@ -457,7 +457,7 @@ export struct AssistantCards {
       }
       if (Wire.text(this.itemBody(item), 'filed_at')) Text(tr('assistant_feed_filed_elsewhere')).fontSize(Tokens.meta).fontColor($r('sys.color.font_secondary'))
       if (Wire.text(item, 'ref')) Button(tr('assistant_feed_open_inbox')).height(Tokens.touch).onClick(() => this.openInbox(item))
-    }.width('100%').alignItems(HorizontalAlign.Start).padding(Tokens.inset)
+    }.width('100%').alignItems(HorizontalAlign.Start).padding(Tokens.page)
       .backgroundColor($r('sys.color.comp_background_tertiary'))
   }
 
@@ -495,7 +495,7 @@ export struct AssistantCards {
   @Builder unsupported(item: Record<string, Object>) {
     Column({ space: Tokens.gap }) {
       Text(tr('assistant_feed_unsupported_activity')).fontSize(Tokens.body)
-    }.width('100%').alignItems(HorizontalAlign.Start).padding(Tokens.inset)
+    }.width('100%').alignItems(HorizontalAlign.Start).padding(Tokens.page)
       .backgroundColor($r('sys.color.comp_background_tertiary'))
   }
 
@@ -560,7 +560,7 @@ export struct AssistantCards {
             (task.readonly || task.permission === 'bypassPermissions')))
           .onClick(() => this.feed.startEditedPlan())
       }.width('100%')
-    }.width('100%').height('100%').padding({ left: Tokens.page, right: Tokens.page, top: Tokens.page, bottom: this.editorInset + Tokens.footer }).alignItems(HorizontalAlign.Start)
+    }.width('100%').height('100%').padding({ left: Tokens.page, right: Tokens.page, top: Tokens.page, bottom: this.editorInset + Tokens.page }).alignItems(HorizontalAlign.Start)
       .id(this.editorNodeId).onAreaChange(() => this.measureEditor())
   }
 

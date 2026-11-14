@@ -1765,11 +1765,13 @@ larger. XS/SM/MD use a stack and LG/XL use native split navigation, based on the
 device name. The expanded master pane starts at 320 vp, drags from 280 to 440 vp and collapses to 64 vp. It has no
 permanent third pane or replacement navigation rail.
 
-Navigation owns system avoidance on main pages. Content adds only its 4 vp business footer; do not copy the gesture
+Navigation owns system avoidance on main pages. Main content adds only its 4 vp business footer; do not copy the gesture
 area height into padding. A bottom sheet measures the actual content host against the current system avoidance
 boundary after layout and adds only the remaining overlap. Recompute when the host or avoid area changes; an already
-avoided host or centered sheet needs zero. Never hard-code an inset or repeat it on inner rows. Preserve the system
+avoided host or centered sheet needs zero extra system inset. Never hard-code an inset or repeat it on inner rows. Preserve the system
 gesture region and keep the last row and primary action above it.
+
+The 4 vp footer is application spacing, not a fixed HarmonyOS safe-area measurement. Native Navigation paints the primary pane's grouped/canvas background through the gesture area while leaving scrolling controls in the safe layout region; a short list's remaining height is not extra inset. Question, plan-editor, context-selection and Spaces sheet content uses 16 vp internal edges plus only the outstanding measured system overlap. Chat siblings and wrapped GridRow rows use 8 vp gaps, and same-level feed cards use 16 vp content edges. Do not merge the jump-to-latest button into the composer surface. Appearance labels and Select controls wrap as whole items. At enlarged text sizes Inbox status uses the Agents native Select pattern. Native Back visibility also determines whether a custom title needs its own leading 16 vp inset.
 
 Conversation detail hides its title only while the matching selected row is fully visible in the expanded master
 and identifies the conversation for the same owner. Compact, collapsed, filtered-out, offscreen or different-owner

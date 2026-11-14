@@ -458,7 +458,15 @@ export struct InboxWorkspacePage {
         Select(this.optionList(this.workspace.accountOptions.map((value: string) => value === 'all' ? tr('all') : this.workspace.accountName(value))))
           .selected(this.accountIndex()).value(this.workspace.accountFilter === 'all' ? tr('all') : this.workspace.accountName(this.workspace.accountFilter)).onSelect((index: number) => this.workspace.accountFilter = this.workspace.accountOptions[index]).flexGrow(1).flexShrink(0).constraintSize({ maxWidth: '100%' })
       }.width('100%').padding({ left: Tokens.page, right: Tokens.page })
-      CapsuleSegmentButtonV2({ itemSelectedBackgroundColor: ColorMetrics.resourceColor(Colors.action), itemSelectedFontColor: ColorMetrics.resourceColor(Colors.onAction), itemFontColor: ColorMetrics.resourceColor(Colors.secondary), buttonBackgroundColor: ColorMetrics.resourceColor(Colors.control), itemFontSize: LengthMetrics.fp(Tokens.meta), itemSelectedFontSize: LengthMetrics.fp(Tokens.meta), items: new SegmentButtonV2Items([{ text: tr('inbox_open') }, { text: tr('done') }, { text: tr('all') }]),
+      if (this.environment.fontScale >= 1.5) Row() {
+        Select([{ value: tr('inbox_open') }, { value: tr('done') }, { value: tr('all') }])
+        .selected(this.workspace.statusFilter === 'open' ? 0 : this.workspace.statusFilter === 'done' ? 1 : 2)
+        .value(tr(this.workspace.statusFilter === 'open' ? 'inbox_open' : this.workspace.statusFilter === 'done' ? 'done' : 'all'))
+        .font({ size: Tokens.body }).constraintSize({ minHeight: Tokens.touch }).width('100%')
+        .onSelect((index: number) => this.workspace.statusFilter = index === 0 ? 'open' : index === 1 ? 'done' : 'all')
+        .id('inbox.status')
+      }.width('100%').padding({ left: Tokens.page, right: Tokens.page })
+      else CapsuleSegmentButtonV2({ itemSelectedBackgroundColor: ColorMetrics.resourceColor(Colors.action), itemSelectedFontColor: ColorMetrics.resourceColor(Colors.onAction), itemFontColor: ColorMetrics.resourceColor(Colors.secondary), buttonBackgroundColor: ColorMetrics.resourceColor(Colors.control), itemFontSize: LengthMetrics.fp(Tokens.meta), itemSelectedFontSize: LengthMetrics.fp(Tokens.meta), itemMinHeight: LengthMetrics.vp(Tokens.touch), buttonMinHeight: LengthMetrics.vp(Tokens.touch), buttonPadding: LengthMetrics.vp(Tokens.fine), items: new SegmentButtonV2Items([{ text: tr('inbox_open') }, { text: tr('done') }, { text: tr('all') }]),
         selectedIndex: this.workspace.statusFilter === 'open' ? 0 : this.workspace.statusFilter === 'done' ? 1 : 2,
         $selectedIndex: (index: number) => this.workspace.statusFilter = index === 0 ? 'open' : index === 1 ? 'done' : 'all' })
         .padding({ left: Tokens.page, right: Tokens.page })

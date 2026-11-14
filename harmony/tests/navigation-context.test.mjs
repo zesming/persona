@@ -15,7 +15,7 @@ function method(name){
  for(;i<source.length&&depth;i++){const c=source[i];if(quote){if(escape)escape=false;else if(c==='\\')escape=true;else if(c===quote)quote='';}else if(c==='"'||c==="'"||c==='`')quote=c;else if(c==='{')depth++;else if(c==='}')depth--;}
  assert.equal(depth,0,name);return source.slice(start,i);
 }
-const names=['chatSelectionShown','peerUsesSelect','measurePeerSlot','readingAgentDetail','routeTarget','openRow','mainDestination','openMain','hideChatTitle','newConversation','resolveMainDestination','ensureMainDestination','pushChat','redeem','childKey','routeRow','openSettings','settingsKind','settingsModel','targetReady','openLinkedResource','openFrom','openComputer','handoffResource','restoreTarget','routeShown'];
+const names=['destinationBackHidden','chatSelectionShown','peerUsesSelect','measurePeerSlot','readingAgentDetail','routeTarget','openRow','mainDestination','openMain','hideChatTitle','newConversation','resolveMainDestination','ensureMainDestination','pushChat','redeem','childKey','routeRow','openSettings','settingsKind','settingsModel','targetReady','openLinkedResource','openFrom','openComputer','handoffResource','restoreTarget','routeShown'];
 const NativeNavigation=new Function('NavigationContext','ResourceRow','mainConversationData','Wire','Tokens','return '+stripTypeScriptTypes('class NativeNavigation {'+names.map(method).join('\n')+'}'))(NavigationContext,ResourceRow,mainConversationData,Wire,Tokens);
 function row(id='source',manager='owner-b',kind='conversation'){const r=new ResourceRow(id,id,kind);r.manager=manager;r.machine='machine';r.session=id;return r;}
 function deferred(){let resolve;const promise=new Promise(r=>resolve=r);return {promise,resolve};}
@@ -215,4 +215,25 @@ test('a cached chat selection is highlighted only while its destination context 
  pushed.push({name:'settings'});shell.activeChild='settings';assert.equal(shell.chatSelectionShown('conversation'),false);assert.equal(shell.chatSelectionShown('session'),false);
  pushed.splice(0);pushed.push({name:'session'},{name:'history'});shell.activeChild='history';assert.equal(shell.chatSelectionShown('session'),true);
  shell.activeChild='';assert.equal(shell.chatSelectionShown('session'),false);pushed.splice(0);pushed.push({name:'conversation'});shell.activeChild='chat';assert.equal(shell.chatSelectionShown('conversation'),true);
+});
+
+test('root Agent details hide Back only in the expanded Agents navigation context',()=>{
+ for(const wide of [false,true]) for(const section of [0,1]) for(const root of [false,true]) {
+  const {shell,primary}=fixture();primary.section=section;shell.wide=()=>wide;
+  const target=row('agent','owner-b','session');target.raw=JSON.stringify({navigation_root:root});
+  assert.equal(shell.destinationBackHidden('session',JSON.stringify(target)),wide&&section===1&&root);
+  assert.equal(shell.destinationBackHidden('resources','inbox'),false);
+ }
+});
+
+test('split root title spacing follows the visible path and keeps child Back controls',()=>{
+ const {shell,pushed}=fixture();shell.wide=()=>true;
+ pushed.push({name:'resources',param:'inbox'});
+ assert.equal(shell.destinationBackHidden('resources','inbox'),true);
+ pushed.push({name:'resources',param:'knowledge'});
+ assert.equal(shell.destinationBackHidden('resources','knowledge'),false);
+ pushed[1].param='inbox';
+ assert.equal(shell.destinationBackHidden('resources','inbox'),false,'same-name child must keep its native Back control');
+ pushed.pop();shell.wide=()=>false;
+ assert.equal(shell.destinationBackHidden('resources','inbox'),false,'a single-pane first destination returns to its primary list');
 });

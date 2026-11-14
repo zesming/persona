@@ -1,4 +1,4 @@
-import { ComposeListItemV2, ContentItemV2 } from '@kit.ArkUI';
+import { ComposeListItemV2, ContentItemV2, LengthMetrics } from '@kit.ArkUI';
 import { ClientModel } from '../models/ClientModel';
 import { ManagementModel, ManagementRow, ManagementInput } from '../models/ManagementModel';
 import { ResourceRow, Wire } from '../models/Wire';
@@ -1105,53 +1105,53 @@ export struct SettingsPage {
           onRefresh: this.appearanceRefreshAction(revision) })
       }, (revision: number) => String(revision))
       ListItem() {
-        Row({ space: Tokens.gap }) {
-          Text(tr('language')).fontSize(Tokens.body).fontColor(Colors.ink).layoutWeight(1)
+        Flex({ wrap: FlexWrap.Wrap, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
+          Text(tr('language')).fontSize(Tokens.body).fontColor(Colors.ink).flexGrow(1).flexShrink(0).constraintSize({ maxWidth: '100%' })
           Select([{ value: tr('system') }, { value: 'English' }, { value: '简体中文' }, { value: '日本語' }])
             .selected(['default', 'en-US', 'zh-CN', 'ja-JP'].indexOf(this.model.language))
             .value(this.model.language === 'default' ? tr('system') : this.model.language === 'en-US' ? 'English' : this.model.language === 'zh-CN' ? '简体中文' : '日本語')
-            .constraintSize({ minHeight: Tokens.touch }).enabled(!this.model.languageChanging && this.appearanceCurrent(this.model, this.appearanceRevision, this.model.scope(), this.model.connectionGeneration()))
+            .flexShrink(0).constraintSize({ minHeight: Tokens.touch, maxWidth: '100%' }).enabled(!this.model.languageChanging && this.appearanceCurrent(this.model, this.appearanceRevision, this.model.scope(), this.model.connectionGeneration()))
             .onSelect(this.appearanceSelector('language', this.appearanceRevision)).id('appearance.language')
         }.constraintSize({ minHeight: Tokens.touch }).padding({ left: Tokens.page, right: Tokens.page, top: Tokens.inset, bottom: Tokens.inset }).width('100%')
       }
       ListItem() {
-        Row({ space: Tokens.gap }) {
-          Text(tr('color_mode')).fontSize(Tokens.body).fontColor(Colors.ink).layoutWeight(1)
+        Flex({ wrap: FlexWrap.Wrap, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
+          Text(tr('color_mode')).fontSize(Tokens.body).fontColor(Colors.ink).flexGrow(1).flexShrink(0).constraintSize({ maxWidth: '100%' })
           Select([{ value: tr('system') }, { value: tr('light') }, { value: tr('dark') }]).selected(this.model.appearance)
             .value(tr(['system', 'light', 'dark'][this.model.appearance] || 'system'))
-            .constraintSize({ minHeight: Tokens.touch }).enabled(this.appearanceCurrent(this.model, this.appearanceRevision, this.model.scope(), this.model.connectionGeneration()))
+            .flexShrink(0).constraintSize({ minHeight: Tokens.touch, maxWidth: '100%' }).enabled(this.appearanceCurrent(this.model, this.appearanceRevision, this.model.scope(), this.model.connectionGeneration()))
             .onSelect(this.appearanceSelector('color', this.appearanceRevision)).id('appearance.color-mode')
         }.constraintSize({ minHeight: Tokens.touch }).padding({ left: Tokens.page, right: Tokens.page, top: Tokens.inset, bottom: Tokens.inset }).width('100%')
       }
       ListItem() {
-        Row({ space: Tokens.gap }) {
-          Text(tr('style')).fontSize(Tokens.body).fontColor(Colors.ink).layoutWeight(1)
+        Flex({ wrap: FlexWrap.Wrap, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
+          Text(tr('style')).fontSize(Tokens.body).fontColor(Colors.ink).flexGrow(1).flexShrink(0).constraintSize({ maxWidth: '100%' })
           Select([{ value: tr('app_style_system') }, { value: tr('app_style_glass') }, { value: tr('app_style_brief') }, { value: tr('app_style_board') }])
             .selected(['system', 'glass', 'brief', 'board'].indexOf(this.model.style) < 0 ? 0 : ['system', 'glass', 'brief', 'board'].indexOf(this.model.style))
             .value(tr(['system', 'glass', 'brief', 'board'].includes(this.model.style) ? 'app_style_' + this.model.style : 'app_style_system'))
-            .constraintSize({ minHeight: Tokens.touch }).enabled(this.appearanceCurrent(this.model, this.appearanceRevision, this.model.scope(), this.model.connectionGeneration()))
+            .flexShrink(0).constraintSize({ minHeight: Tokens.touch, maxWidth: '100%' }).enabled(this.appearanceCurrent(this.model, this.appearanceRevision, this.model.scope(), this.model.connectionGeneration()))
             .onSelect(this.appearanceSelector('style', this.appearanceRevision)).id('appearance.style')
         }.constraintSize({ minHeight: Tokens.touch }).padding({ left: Tokens.page, right: Tokens.page, top: Tokens.inset, bottom: Tokens.inset }).width('100%')
       }
       ListItem() {
-        Row({ space: Tokens.gap }) {
-          Text(tr('agent_density')).fontSize(Tokens.body).fontColor(Colors.ink).layoutWeight(1)
+        Flex({ wrap: FlexWrap.Wrap, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
+          Text(tr('agent_density')).fontSize(Tokens.body).fontColor(Colors.ink).flexGrow(1).flexShrink(0).constraintSize({ maxWidth: '100%' })
           Select([{ value: tr('agent_density_standard') }, { value: tr('agent_density_compact') }])
             .selected(this.look.density === 'compact' ? 1 : 0)
             .value(tr(this.look.density === 'compact' ? 'agent_density_compact' : 'agent_density_standard'))
-            .constraintSize({ minHeight: Tokens.touch }).enabled(this.look.ready && this.appearanceCurrent(this.model, this.appearanceRevision, this.model.scope(), this.model.connectionGeneration()))
+            .flexShrink(0).constraintSize({ minHeight: Tokens.touch, maxWidth: '100%' }).enabled(this.look.ready && this.appearanceCurrent(this.model, this.appearanceRevision, this.model.scope(), this.model.connectionGeneration()))
             .onSelect(this.appearanceSelector('density', this.appearanceRevision)).id('appearance.agent-density')
         }.constraintSize({ minHeight: Tokens.touch }).padding({ left: Tokens.page, right: Tokens.page, top: Tokens.inset, bottom: Tokens.inset }).width('100%')
       }
     ListItem() {
-      Row({ space: Tokens.gap }) {
-        Text(tr('grouping')).fontSize(Tokens.body).fontColor(Colors.ink).layoutWeight(1)
+      Flex({ wrap: FlexWrap.Wrap, alignItems: ItemAlign.Center, space: { main: LengthMetrics.vp(Tokens.gap), cross: LengthMetrics.vp(Tokens.gap) } }) {
+        Text(tr('grouping')).fontSize(Tokens.body).fontColor(Colors.ink).flexGrow(1).flexShrink(0).constraintSize({ maxWidth: '100%' })
         if (this.agentWorkspace.isBoundTo(this.model) && !this.agentWorkspace.loading) {
           Select([{ value: tr('agent_group_flat') }, { value: tr('agent_filter_machine') },
             { value: tr('agent_filter_repository') }, { value: tr('agent_filter_worktree') }])
             .selected(this.agentGroupingIndex(this.agentWorkspace))
             .value(tr(['agent_group_flat', 'agent_filter_machine', 'agent_filter_repository', 'agent_filter_worktree'][this.agentGroupingIndex(this.agentWorkspace)]))
-            .constraintSize({ minHeight: Tokens.touch }).enabled(this.appearanceCurrent(this.model, this.appearanceRevision, this.model.scope(), this.model.connectionGeneration()))
+            .flexShrink(0).constraintSize({ minHeight: Tokens.touch, maxWidth: '100%' }).enabled(this.appearanceCurrent(this.model, this.appearanceRevision, this.model.scope(), this.model.connectionGeneration()))
             .onSelect(this.appearanceSelector('group', this.appearanceRevision)).id('appearance.agent-grouping')
         } else LoadingProgress().width(Tokens.touch).height(Tokens.touch).accessibilityText(tr('loading'))
       }.constraintSize({ minHeight: Tokens.touch }).padding({ left: Tokens.page, right: Tokens.page, top: Tokens.inset, bottom: Tokens.inset }).width('100%')
