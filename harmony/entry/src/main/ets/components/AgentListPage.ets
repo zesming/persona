@@ -1,4 +1,5 @@
 import { ColorMetrics, LengthMetrics } from '@kit.ArkUI';
+import { util } from '@kit.ArkTS';
 import { CapsuleSegmentButtonV2, SegmentButtonV2Items } from '@kit.ArkUI';
 import { ClientModel } from '../models/ClientModel';
 import { AgentWorkspace, AgentWorkspaceGroup } from '../models/AgentWorkspace';
@@ -10,6 +11,7 @@ import { ButtonStyles } from '../design/Controls';
 import { Symbols } from '../design/Symbols';
 import { tr } from '../design/Strings';
 import { nativeEnvironment, NativeEnvironment } from '../platform/NativeEnvironment';
+import { nativeSheetInset } from '../platform/NativeInsets';
 import { DeviceLook, deviceLook } from '../models/DeviceLook';
 
 const QUICK_FILTERS: string[] = ['all', 'needs_you', 'working', 'unread'];
@@ -81,6 +83,16 @@ export struct AgentListPage {
   @Local renameTitle: string = '';
   @Local renameTab: string = '';
   @Local filterSheetOpen: boolean = false;
+  @Local filterInset: number = 0;
+  private filterReady: boolean = false;
+  private filterNodeId: string = 'agents.filters.' + util.generateRandomUUID();
+
+  @Monitor('environment.safeBottomPx') filterBoundaryChanged(): void { this.measureFilters(); }
+  private measureFilters(): void {
+    if (!this.filterReady) return;
+    const value = nativeSheetInset(this.getUIContext(), this.filterNodeId, this.environment.safeBottomPx);
+    if (Math.abs(value - this.filterInset) > 0.1) this.filterInset = value;
+  }
 
   aboutToAppear(): void { this.syncRowBindings(); if (this.active) this.activateWorkspace(); }
   aboutToDisappear(): void { this.editorOpen = false; this.filterSheetOpen = false; this.editingAdmission = undefined; this.workspace.revokeRowActions(); if (!this.retainWorkspace) this.workspace.hide(); }
@@ -366,7 +378,8 @@ export struct AgentListPage {
           .selected(this.groupingIndex()).value(tr(['agent_group_flat', 'agent_filter_machine', 'agent_filter_repository', 'agent_filter_worktree'][this.groupingIndex()]))
           .constraintSize({ minHeight: Tokens.touch }).onSelect((index: number) => this.selectGrouping(index)).id('agents.grouping')
       }.alignItems(HorizontalAlign.Start).width('100%')
-    }.alignItems(HorizontalAlign.Start).padding({ left: Tokens.page, right: Tokens.page, top: Tokens.inset, bottom: Tokens.inset }).width('100%')
+    }.alignItems(HorizontalAlign.Start).padding({ left: Tokens.page, right: Tokens.page, top: Tokens.inset, bottom: Tokens.inset + this.filterInset }).width('100%')
+      .id(this.filterNodeId).onAreaChange(() => this.measureFilters())
   }
 
   private isRowSelected(binding: BoundAgentRow): boolean {
@@ -483,7 +496,10 @@ export struct AgentListPage {
         .divider({ strokeWidth: Tokens.hairline, startMargin: Tokens.page + Tokens.avatar + Tokens.gap,
           endMargin: Tokens.page, color: Colors.divider })
       }.width('100%').layoutWeight(1).onRefreshing(() => { this.workspace.setReadingDetail(false); this.workspace.refresh(this.model).finally(() => { this.workspace.setReadingDetail(this.readingDetail); this.refreshing = false; }); })
-      .bindSheet($$this.filterSheetOpen, this.filterSheet(), { title: { title: tr('agent_filters_title') }, height: SheetSize.FIT_CONTENT, showClose: true })
+      .bindSheet($$this.filterSheetOpen, this.filterSheet(), {
+        title: { title: tr('agent_filters_title') }, height: SheetSize.FIT_CONTENT, showClose: true,
+        onAppear: () => { this.filterReady = true; this.measureFilters(); }, onDisappear: () => this.filterReady = false
+      })
     }.width('100%').height('100%').backgroundColor(Colors.canvas)
       .bindSheet($$this.editorOpen, this.renameForm(), { title: { title: tr('rename') }, height: SheetSize.MEDIUM, showClose: true })
   }
